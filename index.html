@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Copa 2026 – Álbum Familiar</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1a7a4a;--green-light:#e8f5ee;--green-dark:#0f5233;
+  --gold:#c8972a;--gold-light:#fdf6e3;
+  --red:#c0392b;--red-light:#fdecea;
+  --bg:#ffffff;--bg2:#f5f5f3;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.25);
+  --text:#1a1a1a;--muted:#6b6b6b;
+  --radius:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1c;--bg2:#2a2a2a;
+  --border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.25);
+  --text:#f0f0f0;--muted:#999;
+  --green-light:#0d2e1e;--gold-light:#2a1f00;--red-light:#2a0d0d;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);background:var(--bg);padding:1rem;max-width:780px;margin:0 auto}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.app{padding:.75rem 0 2rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
+.brand{font-size:17px;font-weight:500;color:var(--text)}
+.brand span{color:var(--green)}
+.topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--bg2);border-radius:var(--radius);padding:.6rem .75rem}
+.stat .lbl{font-size:11px;color:var(--muted);margin-bottom:3px}
+.stat .val{font-size:20px;font-weight:500}
+.stat.green .val{color:var(--green)}
+.stat.gold .val{color:var(--gold)}
+.prog-wrap{margin-bottom:1.25rem}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.prog-bar{height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.controls{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.controls input[type=text],.controls select{padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;outline:none}
+.controls input[type=text]{flex:1;min-width:130px}
+.controls select{min-width:130px}
+.controls input:focus,.controls select:focus{border-color:var(--green)}
+.filter-row{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.ftab{padding:3px 11px;border:0.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted)}
+.ftab.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.team-section{margin-bottom:1.5rem}
+.team-header{display:flex;align-items:center;gap:10px;margin-bottom:.5rem;cursor:pointer;user-select:none}
+.team-flag{font-size:20px;line-height:1}
+.team-name{font-size:14px;font-weight:500}
+.team-progress{font-size:12px;color:var(--muted);margin-left:auto}
+.team-mini-bar{width:60px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-left:6px}
+.team-mini-fill{height:100%;background:var(--green);border-radius:2px}
+.team-collapse{font-size:11px;color:var(--muted);margin-left:4px}
+.sticker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px}
+.sticker{border:0.5px solid var(--border);border-radius:var(--radius);padding:6px 3px;text-align:center;cursor:pointer;position:relative;user-select:none}
+.sticker:hover{border-color:var(--border2);background:var(--bg2)}
+.sticker.owned{background:var(--green-light);border-color:#5DCAA5}
+.sticker.owned .snum{color:var(--green-dark);font-weight:500}
+.sticker.dup{background:var(--gold-light);border-color:#EF9F27}
+.sticker.dup .snum{color:#633806;font-weight:500}
+.snum{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slbl{font-size:9px;color:var(--muted);display:block;margin-top:1px}
+.sticker.owned .slbl{color:#0F6E56}
+.sticker.dup .slbl{color:#854F0B}
+.dup-controls{display:flex;align-items:center;justify-content:center;gap:3px;margin-top:4px}
+.dup-btn{width:16px;height:16px;border-radius:50%;border:0.5px solid #EF9F27;background:transparent;cursor:pointer;font-size:11px;font-weight:500;color:#633806;display:flex;align-items:center;justify-content:center;line-height:1}
+.dup-btn:hover{background:#EF9F27;color:#fff}
+.dup-num{font-size:11px;font-weight:500;color:#633806;min-width:14px;text-align:center}
+.legend{display:flex;gap:14px;margin-bottom:.75rem;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:3px;border:0.5px solid}
+.d-miss{background:var(--bg);border-color:var(--border2)}
+.d-own{background:var(--green-light);border-color:#5DCAA5}
+.d-dup{background:var(--gold-light);border-color:#EF9F27}
+.btn{padding:6px 13px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;cursor:pointer;font-size:12px;color:var(--text);white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.primary:hover{background:var(--green-dark)}
+.btn.danger{color:var(--red);border-color:#F7C1C1}
+.btn.danger:hover{background:var(--red-light)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem}
+.modal{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:1.25rem;width:100%;max-width:360px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:500;margin-bottom:1rem}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:.75rem;line-height:1.6}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap}
+.modal textarea{width:100%;min-height:90px;padding:8px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:11px;font-family:monospace;background:var(--bg2);color:var(--text);resize:vertical;margin-bottom:.5rem}
+#qr-box{display:flex;justify-content:center;margin:1rem 0}
+#qr-box canvas,#qr-box img{border-radius:var(--radius);max-width:200px;width:100%}
+.merge-result{font-size:13px;border-radius:var(--radius);padding:.5rem .75rem;margin-top:.5rem}
+.merge-ok{background:var(--green-light);color:var(--green)}
+.merge-err{background:var(--red-light);color:var(--red)}
+.hidden{display:none}
+.empty-msg{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+@media(max-width:480px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .topbar-actions{width:100%}
+  .topbar-actions .btn{flex:1;text-align:center}
+}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Seguidor de estampas Panini Copa del Mundo 2026</h2>
+<div class="app">
+
+<div class="topbar">
+  <div><div class="brand">Copa 2026 <span>Álbum Familiar</span></div></div>
+  <div class="topbar-actions">
+    <button class="btn" onclick="openShare()">Compartir QR</button>
+    <button class="btn" onclick="openMerge()">Combinar álbum</button>
+    <button class="btn danger" onclick="confirmReset()">Reiniciar</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat green"><div class="lbl">Tengo</div><div class="val" id="s-owned">0</div></div>
+  <div class="stat"><div class="lbl">Faltan</div><div class="val" id="s-miss">980</div></div>
+  <div class="stat gold"><div class="lbl">Repetidas</div><div class="val" id="s-dups">0</div></div>
+  <div class="stat"><div class="lbl">Completo</div><div class="val" id="s-pct">0%</div></div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-label"><span id="prog-lbl">0 / 980 estampas</span><span id="prog-pct2">0%</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Buscar selección..." oninput="render()">
+  <select id="group-filter" onchange="render()">
+    <option value="">Todos los grupos</option>
+    <option value="A">Grupo A</option><option value="B">Grupo B</option>
+    <option value="C">Grupo C</option><option value="D">Grupo D</option>
+    <option value="E">Grupo E</option><option value="F">Grupo F</option>
+    <option value="G">Grupo G</option><option value="H">Grupo H</option>
+    <option value="I">Grupo I</option><option value="J">Grupo J</option>
+    <option value="K">Grupo K</option><option value="L">Grupo L</option>
+    <option value="INTRO">Intro / Especiales</option>
+  </select>
+</div>
+<div class="filter-row">
+  <button class="ftab on" data-f="all" onclick="setFilter(this)">Todas</button>
+  <button class="ftab" data-f="owned" onclick="setFilter(this)">Tengo</button>
+  <button class="ftab" data-f="missing" onclick="setFilter(this)">Faltan</button>
+  <button class="ftab" data-f="dup" onclick="setFilter(this)">Repetidas</button>
+</div>
+<div class="legend">
+  <div class="leg"><div class="leg-dot d-miss"></div>Falta</div>
+  <div class="leg"><div class="leg-dot d-own"></div>Tengo</div>
+  <div class="leg"><div class="leg-dot d-dup"></div>Repetida (usar + / − para cambiar cantidad)</div>
+</div>
+
+<div id="main-grid"></div>
+</div>
+
+<!-- COMPARTIR -->
+<div class="overlay hidden" id="share-modal">
+  <div class="modal">
+    <h3>Compartir álbum</h3>
+    <p>Tu familia puede escanear este código QR para importar tu colección y combinarla con la suya.</p>
+    <div id="qr-box"></div>
+    <p style="font-size:11px;text-align:center;color:var(--muted)" id="qr-size-note"></p>
+    <div class="row"><button class="btn" onclick="closeModal('share-modal')">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- COMBINAR -->
+<div class="overlay hidden" id="merge-modal">
+  <div class="modal">
+    <h3>Combinar álbum familiar</h3>
+    <p>Pega el código de otro miembro de la familia. Las repetidas se suman para saber qué hay para cambiar.</p>
+    <textarea id="merge-input" placeholder="Pega el código aquí..."></textarea>
+    <div id="merge-result" class="hidden merge-result"></div>
+    <div class="row">
+      <button class="btn" onclick="closeModal('merge-modal')">Cancelar</button>
+      <button class="btn primary" onclick="doMerge()">Combinar</button>
+    </div>
+  </div>
+</div>
+
+<!-- REINICIAR -->
+<div class="overlay hidden" id="reset-modal">
+  <div class="modal">
+    <h3>¿Reiniciar colección?</h3>
+    <p>Se borrarán todas tus estampas. Esta acción no se puede deshacer.</p>
+    <div class="row">
+      <button class="btn" onclick="closeModal('reset-modal')">Cancelar</button>
+      <button class="btn danger" onclick="doReset()">Sí, reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEAMS=[
+  {id:'USA',name:'Estados Unidos',flag:'🇺🇸',group:'A'},
+  {id:'MEX',name:'México',flag:'🇲🇽',group:'A'},
+  {id:'CAN',name:'Canadá',flag:'🇨🇦',group:'A'},
+  {id:'PAN',name:'Panamá',flag:'🇵🇦',group:'A'},
+  {id:'ARG',name:'Argentina',flag:'🇦🇷',group:'B'},
+  {id:'CHI',name:'Chile',flag:'🇨🇱',group:'B'},
+  {id:'PER',name:'Perú',flag:'🇵🇪',group:'B'},
+  {id:'AUS',name:'Australia',flag:'🇦🇺',group:'B'},
+  {id:'BRA',name:'Brasil',flag:'🇧🇷',group:'C'},
+  {id:'URU',name:'Uruguay',flag:'🇺🇾',group:'C'},
+  {id:'COL',name:'Colombia',flag:'🇨🇴',group:'C'},
+  {id:'ECU',name:'Ecuador',flag:'🇪🇨',group:'C'},
+  {id:'FRA',name:'Francia',flag:'🇫🇷',group:'D'},
+  {id:'ENG',name:'Inglaterra',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',group:'D'},
+  {id:'POL',name:'Polonia',flag:'🇵🇱',group:'D'},
+  {id:'ALB',name:'Albania',flag:'🇦🇱',group:'D'},
+  {id:'GER',name:'Alemania',flag:'🇩🇪',group:'E'},
+  {id:'POR',name:'Portugal',flag:'🇵🇹',group:'E'},
+  {id:'SCO',name:'Escocia',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',group:'E'},
+  {id:'HUN',name:'Hungría',flag:'🇭🇺',group:'E'},
+  {id:'ESP',name:'España',flag:'🇪🇸',group:'F'},
+  {id:'NED',name:'Países Bajos',flag:'🇳🇱',group:'F'},
+  {id:'CRO',name:'Croacia',flag:'🇭🇷',group:'F'},
+  {id:'MAR',name:'Marruecos',flag:'🇲🇦',group:'F'},
+  {id:'BEL',name:'Bélgica',flag:'🇧🇪',group:'G'},
+  {id:'SUI',name:'Suiza',flag:'🇨🇭',group:'G'},
+  {id:'UKR',name:'Ucrania',flag:'🇺🇦',group:'G'},
+  {id:'SLO',name:'Eslovaquia',flag:'🇸🇰',group:'G'},
+  {id:'SEN',name:'Senegal',flag:'🇸🇳',group:'H'},
+  {id:'EGY',name:'Egipto',flag:'🇪🇬',group:'H'},
+  {id:'NZL',name:'Nueva Zelanda',flag:'🇳🇿',group:'H'},
+  {id:'SLN',name:'Eslovenia',flag:'🇸🇮',group:'H'},
+  {id:'JPN',name:'Japón',flag:'🇯🇵',group:'I'},
+  {id:'KOR',name:'Corea del Sur',flag:'🇰🇷',group:'I'},
+  {id:'IRN',name:'Irán',flag:'🇮🇷',group:'I'},
+  {id:'UZB',name:'Uzbekistán',flag:'🇺🇿',group:'I'},
+  {id:'NGR',name:'Nigeria',flag:'🇳🇬',group:'J'},
+  {id:'CIV',name:'Costa de Marfil',flag:'🇨🇮',group:'J'},
+  {id:'GHA',name:'Ghana',flag:'🇬🇭',group:'J'},
+  {id:'CMR',name:'Camerún',flag:'🇨🇲',group:'J'},
+  {id:'SAU',name:'Arabia Saudita',flag:'🇸🇦',group:'K'},
+  {id:'QAT',name:'Qatar',flag:'🇶🇦',group:'K'},
+  {id:'IRQ',name:'Irak',flag:'🇮🇶',group:'K'},
+  {id:'KUW',name:'Kuwait',flag:'🇰🇼',group:'K'},
+  {id:'ITA',name:'Italia',flag:'🇮🇹',group:'L'},
+  {id:'CZE',name:'Rep. Checa',flag:'🇨🇿',group:'L'},
+  {id:'TUR',name:'Turquía',flag:'🇹🇷',group:'L'},
+  {id:'VEN',name:'Venezuela',flag:'🇻🇪',group:'L'},
+  {id:'INTRO',name:'Intro y Especiales',flag:'🌍',group:'INTRO',count:20},
+];
+const SLOT_LABELS=['Escudo','Foto equipo','J1','J2','J3','J4','J5','J6','J7','J8','J9','J10','J11','J12','J13','J14','J15','J16','J17','J18'];
+const TOTAL=980;
+let col={};
+function load(){try{const s=localStorage.getItem('wc26_col_v2');if(s)col=JSON.parse(s);}catch(e){}}
+function save(){localStorage.setItem('wc26_col_v2',JSON.stringify(col));}
+function getCount(tid,idx){return(col[tid]&&col[tid][idx])?col[tid][idx]:0;}
+function setCount(tid,idx,v){if(!col[tid])col[tid]={};col[tid][idx]=Math.max(0,v);if(col[tid][idx]===0)delete col[tid][idx];save();}
+function updateStats(){
+  let owned=0,dups=0;
+  TEAMS.forEach(t=>{const cnt=t.count||20;for(let i=0;i<cnt;i++){const c=getCount(t.id,i);if(c>=1)owned++;if(c>=2)dups+=(c-1);}});
+  const miss=TOTAL-owned,pct=Math.round(owned/TOTAL*100);
+  document.getElementById('s-owned').textContent=owned;
+  document.getElementById('s-miss').textContent=miss;
+  document.getElementById('s-dups').textContent=dups;
+  document.getElementById('s-pct').textContent=pct+'%';
+  document.getElementById('prog-lbl').textContent=owned+' / '+TOTAL+' estampas';
+  document.getElementById('prog-pct2').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+}
+let activeFilter='all',collapsedTeams={};
+function setFilter(btn){document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');activeFilter=btn.dataset.f;render();}
+function render(){
+  const search=document.getElementById('search').value.toLowerCase();
+  const groupF=document.getElementById('group-filter').value;
+  const grid=document.getElementById('main-grid');
+  grid.innerHTML='';let anyVisible=false;
+  TEAMS.forEach(team=>{
+    if(search&&!team.name.toLowerCase().includes(search))return;
+    if(groupF&&team.group!==groupF)return;
+    const cnt=team.count||20;
+    const slots=Array.from({length:cnt},(_,i)=>getCount(team.id,i));
+    const hasOwned=slots.some(c=>c>=1),hasMissing=slots.some(c=>c===0),hasDup=slots.some(c=>c>=2);
+    if(activeFilter==='owned'&&!hasOwned)return;
+    if(activeFilter==='missing'&&!hasMissing)return;
+    if(activeFilter==='dup'&&!hasDup)return;
+    anyVisible=true;
+    const ownedCount=slots.filter(c=>c>=1).length,pct=Math.round(ownedCount/cnt*100);
+    const sec=document.createElement('div');sec.className='team-section';
+    const hdr=document.createElement('div');hdr.className='team-header';
+    hdr.innerHTML=`<span class="team-flag">${team.flag}</span><span class="team-name">${team.name}</span><span class="team-progress">${ownedCount}/${cnt}</span><div class="team-mini-bar"><div class="team-mini-fill" style="width:${pct}%"></div></div><span class="team-collapse">${collapsedTeams[team.id]?'▶':'▼'}</span>`;
+    hdr.onclick=()=>{collapsedTeams[team.id]=!collapsedTeams[team.id];render();};
+    sec.appendChild(hdr);
+    if(!collapsedTeams[team.id]){
+      const g=document.createElement('div');g.className='sticker-grid';
+      for(let i=0;i<cnt;i++){
+        const c=getCount(team.id,i);
+        if(activeFilter==='owned'&&c<1)continue;
+        if(activeFilter==='missing'&&c>0)continue;
+        if(activeFilter==='dup'&&c<2)continue;
+        const s=document.createElement('div');
+        s.className='sticker'+(c>=2?' dup':c===1?' owned':'');
+        const label=team.id+' '+(i+1),sublabel=SLOT_LABELS[i]||('J'+(i-1));
+        let inner=`<span class="snum">${label}</span><span class="slbl">${sublabel}</span>`;
+        if(c>=2)inner+=`<div class="dup-controls"><button class="dup-btn" onclick="event.stopPropagation();changeCount('${team.id}',${i},-1)">−</button><span class="dup-num">${c}</span><button class="dup-btn" onclick="event.stopPropagation();changeCount('${team.id}',${i},1)">+</button></div>`;
+        s.innerHTML=inner;s.onclick=()=>toggleSticker(team.id,i);g.appendChild(s);
+      }
+      sec.appendChild(g);
+    }
+    grid.appendChild(sec);
+  });
+  if(!anyVisible){const em=document.createElement('div');em.className='empty-msg';em.textContent='No hay estampas con ese filtro.';grid.appendChild(em);}
+  updateStats();
+}
+function toggleSticker(tid,idx){const c=getCount(tid,idx);if(c===0)setCount(tid,idx,1);else if(c===1)setCount(tid,idx,2);render();}
+function changeCount(tid,idx,delta){setCount(tid,idx,Math.max(0,getCount(tid,idx)+delta));render();}
+function openShare(){
+  document.getElementById('share-modal').classList.remove('hidden');
+  const box=document.getElementById('qr-box');box.innerHTML='';
+  const note=document.getElementById('qr-size-note');
+  const pairs=[];
+  TEAMS.forEach(t=>{const cnt=t.count||20;for(let i=0;i<cnt;i++){const c=getCount(t.id,i);if(c>0)pairs.push(t.id+':'+i+':'+c);}});
+  const payload='wc26v2|'+pairs.join(',');
+  if(payload.length>2500){
+    note.textContent='Colección muy grande para QR. Copia el código y compártelo por WhatsApp.';
+    const ta=document.createElement('textarea');ta.value=payload;
+    ta.style.cssText='width:100%;height:80px;font-size:10px;font-family:monospace;padding:6px;border:1px solid #ccc;border-radius:8px;background:var(--bg2);color:var(--text)';
+    box.appendChild(ta);
+  } else {
+    note.textContent='Escanéalo con otro teléfono que tenga la app, luego toca "Combinar álbum".';
+    new QRCode(box,{text:payload,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+  }
+}
+function openMerge(){document.getElementById('merge-modal').classList.remove('hidden');document.getElementById('merge-input').value='';document.getElementById('merge-result').classList.add('hidden');}
+function doMerge(){
+  const raw=document.getElementById('merge-input').value.trim();
+  const res=document.getElementById('merge-result');res.classList.remove('hidden','merge-ok','merge-err');
+  if(!raw.startsWith('wc26v2|')){res.textContent='Código inválido. Asegúrate de copiarlo completo.';res.classList.add('merge-err');return;}
+  const data=raw.slice(7);let added=0,updated=0;
+  if(data){data.split(',').forEach(pair=>{const parts=pair.split(':');if(parts.length<3)return;const tid=parts[0],idx=parseInt(parts[1]),c=parseInt(parts[2]);if(!tid||isNaN(idx)||isNaN(c))return;const existing=getCount(tid,idx);setCount(tid,idx,existing+c);if(existing===0)added++;else updated++;});}
+  render();res.textContent='¡Combinado! '+added+' estampas nuevas, '+updated+' actualizadas con copias sumadas.';res.classList.add('merge-ok');
+}
+function confirmReset(){document.getElementById('reset-modal').classList.remove('hidden');}
+function doReset(){col={};save();render();closeModal('reset-modal');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+document.addEventListener('click',e=>{['share-modal','merge-modal','reset-modal'].forEach(id=>{const m=document.getElementById(id);if(e.target===m)m.classList.add('hidden');});});
+load();render();
+</script>
+</body>
+</html>
