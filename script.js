@@ -96,6 +96,15 @@ function updateStats() {
 }
 
 let activeFilter = 'all', collapsedTeams = {};
+let tradeMode = false;
+
+function toggleTradeMode() {
+  tradeMode = !tradeMode;
+  const btn = document.getElementById('trade-mode-btn');
+  if (!btn) return;
+  btn.textContent = 'Modo cambio: ' + (tradeMode ? 'ON' : 'OFF');
+  btn.classList.toggle('primary', tradeMode);
+}
 
 function setFilter(btn) {
   document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
@@ -209,7 +218,11 @@ function render() {
 
 function toggleSticker(tid, idx) {
   const c = getCount(tid, idx);
-  setCount(tid, idx, c + 1);
+  if (tradeMode) {
+    if (c > 1) setCount(tid, idx, c - 1);
+  } else {
+    setCount(tid, idx, c + 1);
+  }
   render();
 }
 
