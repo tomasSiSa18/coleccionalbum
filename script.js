@@ -1,5 +1,5 @@
 const TEAMS = [
-  {id: 'INTRO', name: 'Intro y Especiales', flag: '🌍', group: 'INTRO', count: 20},
+  {id: 'FWC', name: 'Intro y Especiales', flag: '🌍', group: 'FWC', count: 20},
   {id: 'USA', name: 'Estados Unidos', flag: '🇺🇸', group: 'A'},
   {id: 'MEX', name: 'México', flag: '🇲🇽', group: 'A'},
   {id: 'CAN', name: 'Canadá', flag: '🇨🇦', group: 'A'},
@@ -170,17 +170,29 @@ function render() {
         let inner = `<span class="snum">${label}</span><span class="slbl">${sublabel}</span>`;
 
         if (c >= 2) {
-          inner += `
-            <div class="dup-controls">
-              <button class="dup-btn" onclick="event.stopPropagation(); changeCount('${team.id}', ${i}, -1)">−</button>
-              <span class="dup-num">${c}</span>
-              <button class="dup-btn" onclick="event.stopPropagation(); changeCount('${team.id}', ${i}, 1)">+</button>
-            </div>
-          `;
+          inner += `<span class="dup-num">${c}</span>`;
         }
 
         s.innerHTML = inner;
         s.onclick = () => toggleSticker(team.id, i);
+        
+        // Right-click to uncheck
+        s.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          uncheckSticker(team.id, i);
+        });
+        
+        // Long press on mobile to uncheck
+        let longPressTimer;
+        s.addEventListener('touchstart', () => {
+          longPressTimer = setTimeout(() => {
+            uncheckSticker(team.id, i);
+          }, 500);
+        });
+        s.addEventListener('touchend', () => {
+          clearTimeout(longPressTimer);
+        });
+        
         g.appendChild(s);
       }
       sec.appendChild(g);
@@ -199,8 +211,13 @@ function render() {
 
 function toggleSticker(tid, idx) {
   const c = getCount(tid, idx);
-  if (c === 0) setCount(tid, idx, 1);
-  else if (c === 1) setCount(tid, idx, 2);
+  setCount(tid, idx, c + 1);
+  render();
+}
+
+function uncheckSticker(tid, idx) {
+  const c = getCount(tid, idx);
+  if (c > 0) setCount(tid, idx, c - 1);
   render();
 }
 
