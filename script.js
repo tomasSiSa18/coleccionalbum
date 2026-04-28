@@ -50,11 +50,6 @@ const TEAMS = [
   {id: 'VEN', name: 'Venezuela', flag: '🇻🇪', group: 'L'}
 ];
 
-const SLOT_LABELS = [
-  'Escudo', 'Foto equipo', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8',
-  'J9', 'J10', 'J11', 'J12', 'J13', 'J14', 'J15', 'J16', 'J17', 'J18'
-];
-
 const TOTAL = 980;
 let col = {};
 
@@ -121,6 +116,7 @@ function render() {
     if (groupF && team.group !== groupF) return;
 
     const cnt = team.count || 20;
+
     const slots = Array.from({length: cnt}, (_, i) => getCount(team.id, i));
     const hasOwned = slots.some(c => c >= 1);
     const hasMissing = slots.some(c => c === 0);
@@ -165,9 +161,11 @@ function render() {
         const s = document.createElement('div');
         s.className = 'sticker' + (c >= 2 ? ' dup' : c === 1 ? ' owned' : '');
 
-        const label = team.id + ' ' + (i + 1);
-        const sublabel = SLOT_LABELS[i] || ('J' + (i - 1));
-        let inner = `<span class="snum">${label}</span><span class="slbl">${sublabel}</span>`;
+        const stickerNumber = team.id === 'FWC'
+          ? String(i).padStart(2, '0')
+          : String(i + 1);
+        const label = team.id + ' ' + stickerNumber;
+        let inner = `<span class="snum">${label}</span>`;
 
         if (c >= 2) {
           inner += `<span class="dup-num">${c}</span>`;
